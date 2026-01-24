@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        go-version: ['1.25', '1.26']
+        go-version: ['1.25.0', '1.25.6']
     steps:
       - uses: actions/checkout@v4
 
@@ -35,7 +35,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.26'
+          go-version: '1.25.6'
           cache: true
 
       - name: Install golangci-lint
@@ -52,7 +52,7 @@ jobs:
             exit 1
           fi
 
-  cross-compile:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -60,16 +60,11 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.26'
+          go-version: '1.25.6'
           cache: true
 
-      - name: Build cross-platform binaries
-        run: |
-          platforms=("linux/amd64" "linux/arm64" "darwin/amd64" "darwin/arm64" "windows/amd64")
-          for platform in "${platforms[@]}"; do
-            os="${platform%%/*}"
-            arch="${platform##*/}"
-            echo "Building for $os/$arch..."
-            GOOS="$os" GOARCH="$arch" go build -o "bin/searxng-mcp-$os-$arch" ./cmd/main
-          done
-          ls -la bin/
+      - name: Install GoReleaser
+        run: go install github.com/goreleaser/goreleaser/v2@latest
+
+      - name: Run GoReleaser (snapshot)
+        run: goreleaser build --snapshot --clean
