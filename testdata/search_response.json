@@ -1,0 +1,59 @@
+{
+  "query": "golang tutorial",
+  "number_of_results": 123456,
+  "results": [
+    {
+      "url": "https://go.dev/tour/",
+      "title": "A Tour of Go",
+      "content": "Welcome to a tour of the Go programming language. The tour is divided into a list of modules that you can access by clicking on links...",
+      "publishedDate": "2024-01-15",
+      "engine": "google",
+      "category": "general",
+      "score": 9.8,
+      "thumbnail": "",
+      "img_src": "",
+      "engines": ["google"],
+      "positions": [1]
+    },
+    {
+      "url": "https://go.dev/doc/tutorial/",
+      "title": "Go Tutorial",
+      "content": "This tutorial will get you started with Go by walking you through a simple program.",
+      "publishedDate": "2024-01-10",
+      "engine": "bing",
+      "category": "general",
+      "score": 9.5,
+      "thumbnail": "",
+      "img_src": "",
+      "engines": ["bing"],
+      "positions": [1]
+    },
+    {
+      "url": "https://www.golang-book.com/",
+      "title": "The Go Programming Language Book",
+      "content": "An introductory book for learning Go programming language from scratch.",
+      "publishedDate": "2023-12-01",
+      "engine": "duckduckgo",
+      "category": "general",
+      "score": 8.9,
+      "thumbnail": "",
+      "img_src": "",
+      "engines": ["duckduckgo"],
+      "positions": [1]
+    }
+  ],
+  "answers": [
+    "Go is a statically typed, compiled programming language designed at Google."
+  ],
+  "corrections": [],
+  "infoboxes": [],
+  "suggestions": [
+    "golang tutorial for beginners",
+    "golang tutorial pdf",
+    "golang tutorial point"
+  ],
+  "unresponsive_engines": [
+    {"name": "google", "error": "connection timeout"},
+    {"name": "bing", "error": "rate limited"}
+  ]
+}
