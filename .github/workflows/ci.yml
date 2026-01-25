@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        go-version: ['1.25.0', '1.25.6']
+        go-version: ['1.24', '1.25']
     steps:
       - uses: actions/checkout@v4
 
@@ -35,11 +35,13 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.25.6'
+          go-version: '1.25'
           cache: true
 
-      - name: Install golangci-lint
-        run: go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.63
+      - name: Install tools
+        run: |
+          go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.63
+          go install golang.org/x/tools/cmd/goimports@latest
 
       - name: Run golangci-lint
         run: golangci-lint run ./...
@@ -60,7 +62,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.25.6'
+          go-version: '1.25'
           cache: true
 
       - name: Install GoReleaser

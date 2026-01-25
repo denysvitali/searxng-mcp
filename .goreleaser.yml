@@ -18,6 +18,7 @@ builds:
       - arm64
     goarm:
       - '7'
+    mod_timestamp: '{{ .CommitTimestamp }}'
     ldflags:
       - -s -w
       - -X main.version={{.Version}}
@@ -41,6 +42,7 @@ archives:
 
 checksum:
   name_template: 'checksums.txt'
+  algorithm: sha256
 
 changelog:
   sort: asc
@@ -49,8 +51,23 @@ changelog:
       - '^docs:'
       - '^test:'
       - '^ci:'
+      - '^chore:'
+      - '^build:'
 
 release:
   github:
     owner: denysvitali
     name: searxng-mcp
+  draft: false
+  prerelease: auto
+
+signs:
+  - artifacts: checksum
+    args:
+      - "--batch"
+      - "--local-user"
+      - "{{ .Env.GPG_FINGERPRINT }}"
+      - "--output"
+      - "${signature}"
+      - "--detach-sign"
+      - "${artifact}"
