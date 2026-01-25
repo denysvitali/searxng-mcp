@@ -431,3 +431,152 @@ func TestClient_SearchJSON(t *testing.T) {
 	assert.Equal(t, "json search", resp.Query)
 	assert.Len(t, resp.Results, 1)
 }
+
+func TestClient_Search_UnresponsiveEnginesNull(t *testing.T) {
+	defer gock.OffAll()
+
+	// Test with null unresponsive_engines
+	mockResponse := `{
+		"query": "test",
+		"number_of_results": 0,
+		"results": [],
+		"answers": [],
+		"corrections": [],
+		"infoboxes": [],
+		"suggestions": [],
+		"unresponsive_engines": null
+	}`
+
+	gock.New("https://searxng.example.com").
+		Get("/search").
+		MatchParam("q", "test").
+		MatchParam("format", "json").
+		Reply(200).
+		BodyString(mockResponse)
+
+	config := DefaultConfig()
+	client, err := NewClient(config)
+	require.NoError(t, err)
+
+	ctx := context.Background()
+	resp, err := client.Search(ctx, SearchRequest{Query: "test"})
+
+	require.NoError(t, err)
+	assert.NotNil(t, resp)
+	assert.Nil(t, resp.UnresponsiveEngines)
+}
+
+func TestClient_Search_UnresponsiveEnginesEmpty(t *testing.T) {
+	defer gock.OffAll()
+
+	// Test with empty array
+	mockResponse := `{
+		"query": "test",
+		"number_of_results": 0,
+		"results": [],
+		"answers": [],
+		"corrections": [],
+		"infoboxes": [],
+		"suggestions": [],
+		"unresponsive_engines": []
+	}`
+
+	gock.New("https://searxng.example.com").
+		Get("/search").
+		MatchParam("q", "test").
+		MatchParam("format", "json").
+		Reply(200).
+		BodyString(mockResponse)
+
+	config := DefaultConfig()
+	client, err := NewClient(config)
+	require.NoError(t, err)
+
+	ctx := context.Background()
+	resp, err := client.Search(ctx, SearchRequest{Query: "test"})
+
+	require.NoError(t, err)
+	assert.NotNil(t, resp)
+	assert.NotNil(t, resp.UnresponsiveEngines)
+	assert.Len(t, resp.UnresponsiveEngines, 0)
+}
+
+func TestClient_Search_UnresponsiveEnginesSingleObject(t *testing.T) {
+	defer gock.OffAll()
+
+	// Test with single object (edge case if Searxng behaves oddly)
+	mockResponse := `{
+		"query": "test",
+		"number_of_results": 1,
+		"results": [{"url": "https://example.com", "title": "Test", "content": "Content"}],
+		"answers": [],
+		"corrections": [],
+		"infoboxes": [],
+		"suggestions": [],
+		"unresponsive_engines": {"name": "google", "error": "Connection timeout"}
+	}`
+
+	gock.New("https://searxng.example.com").
+		Get("/search").
+		MatchParam("q", "test").
+		MatchParam("format", "json").
+		Reply(200).
+		BodyString(mockResponse)
+
+	config := DefaultConfig()
+	client, err := NewClient(config)
+	require.NoError(t, err)
+
+	ctx := context.Background()
+	resp, err := client.Search(ctx, SearchRequest{Query: "test"})
+
+	require.NoError(t, err)
+	assert.NotNil(t, resp)
+	require.Len(t, resp.UnresponsiveEngines, 1)
+	assert.Equal(t, "google", resp.UnresponsiveEngines[0].Name)
+	assert.Equal(t, "Connection timeout", resp.UnresponsiveEngines[0].Error)
+}
+
+func TestClient_Search_UnresponsiveEnginesMultiple(t *testing.T) {
+	defer gock.OffAll()
+
+	// Test with multiple unresponsive engines
+	mockResponse := `{
+		"query": "test",
+		"number_of_results": 1,
+		"results": [{"url": "https://example.com", "title": "Test", "content": "Content"}],
+		"answers": [],
+		"corrections": [],
+		"infoboxes": [],
+		"suggestions": [],
+		"unresponsive_engines": [
+			{"name": "google", "error": "Connection timeout"},
+			{"name": "bing", "error": "Rate limited"},
+			{"name": "duckduckgo", "error": "Network error"}
+		]
+	}`
+
+	gock.New("https://searxng.example.com").
+		Get("/search").
+		MatchParam("q", "test").
+		MatchParam("format", "json").
+		Reply(200).
+		BodyString(mockResponse)
+
+	config := DefaultConfig()
+	client, err := NewClient(config)
+	require.NoError(t, err)
+
+	ctx := context.Background()
+	resp, err := client.Search(ctx, SearchRequest{Query: "test"})
+
+	require.NoError(t, err)
+	assert.NotNil(t, resp)
+	require.Len(t, resp.UnresponsiveEngines, 3)
+	assert.Equal(t, "google", resp.UnresponsiveEngines[0].Name)
+	assert.Equal(t, "Connection timeout", resp.UnresponsiveEngines[0].Error)
+	assert.Equal(t, "bing", resp.UnresponsiveEngines[1].Name)
+	assert.Equal(t, "Rate limited", resp.UnresponsiveEngines[1].Error)
+	assert.Equal(t, "duckduckgo", resp.UnresponsiveEngines[2].Name)
+	assert.Equal(t, "Network error", resp.UnresponsiveEngines[2].Error)
+}

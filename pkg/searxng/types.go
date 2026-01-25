@@ -1,6 +1,9 @@
 package searxng
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 // SearchRequest represents a search request to Searxng
 type SearchRequest struct {
@@ -107,14 +110,14 @@ type SearchResponse struct {
 
 // APIResponse is the API response format (exported for testing)
 type APIResponse struct {
-	Query               string               `json:"query"`
-	NumberOfResults     int                  `json:"number_of_results"`
-	Results             []APIResult          `json:"results"`
-	Answers             []string             `json:"answers"`
-	Corrections         []string             `json:"corrections"`
-	Infoboxes           []Infobox            `json:"infoboxes"`
-	Suggestions         []string             `json:"suggestions"`
-	UnresponsiveEngines []UnresponsiveEngine `json:"unresponsive_engines"`
+	Query               string          `json:"query"`
+	NumberOfResults     int             `json:"number_of_results"`
+	Results             []APIResult     `json:"results"`
+	Answers             []string        `json:"answers"`
+	Corrections         []string        `json:"corrections"`
+	Infoboxes           []Infobox       `json:"infoboxes"`
+	Suggestions         []string        `json:"suggestions"`
+	UnresponsiveEngines json.RawMessage `json:"unresponsive_engines"` // Changed from []UnresponsiveEngine for flexible parsing
 }
 
 // parsePublishedDate parses a published date string
@@ -172,6 +175,29 @@ func toSearchResponse(r APIResponse) SearchResponse {
 		Corrections:         r.Corrections,
 		Infoboxes:           r.Infoboxes,
 		Suggestions:         r.Suggestions,
-		UnresponsiveEngines: r.UnresponsiveEngines,
+		UnresponsiveEngines: safeParseUnresponsiveEngines(r.UnresponsiveEngines),
 	}
+}
+
+// safeParseUnresponsiveEngines parses the unresponsive_engines field safely
+// It handles null, empty array, single object, or array of objects
+func safeParseUnresponsiveEngines(raw json.RawMessage) []UnresponsiveEngine {
+	if len(raw) == 0 {
+		return nil
+	}
+
+	// Try to unmarshal as array first
+	var engines []UnresponsiveEngine
+	if err := json.Unmarshal(raw, &engines); err == nil {
+		return engines
+	}
+
+	// If that fails, try single object (edge case if Searxng behaves oddly)
+	var single UnresponsiveEngine
+	if err := json.Unmarshal(raw, &single); err == nil {
+		return []UnresponsiveEngine{single}
+	}
+
+	// If both fail, return nil
+	return nil
 }
