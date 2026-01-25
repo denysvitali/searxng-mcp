@@ -26,17 +26,17 @@ type APIRequest struct {
 
 // SearchResult represents a single search result from Searxng
 type SearchResult struct {
-	URL          string
-	Title        string
-	Content      string
+	URL           string
+	Title         string
+	Content       string
 	PublishedDate *time.Time
-	Engine       string
-	Category     string
-	Score        float64
-	Thumbnail    string
-	ImageSrc     string
-	Engines      []string
-	Positions    []int
+	Engine        string
+	Category      string
+	Score         float64
+	Thumbnail     string
+	ImageSrc      string
+	Engines       []string
+	Positions     []int
 }
 
 // APIResult is the API result format (exported for testing)
@@ -56,19 +56,19 @@ type APIResult struct {
 
 // Infobox represents an infobox result from Searxng
 type Infobox struct {
-	Content     string                 `json:"content"`
-	Engine      string                 `json:"engine"`
-	Attribution string                 `json:"attribution"`
-	Images      []InfoboxImage         `json:"images"`
-	Label       string                 `json:"label"`
+	Content       string                `json:"content"`
+	Engine        string                `json:"engine"`
+	Attribution   string                `json:"attribution"`
+	Images        []InfoboxImage        `json:"images"`
+	Label         string                `json:"label"`
 	RelatedTopics []InfoboxRelatedTopic `json:"relatedTopics"`
-	Urls        []InfoboxURL           `json:"urls"`
+	Urls          []InfoboxURL          `json:"urls"`
 }
 
 // InfoboxImage represents an image in an infobox
 type InfoboxImage struct {
-	URL      string `json:"url"`
-	Alt      string `json:"alt"`
+	URL          string `json:"url"`
+	Alt          string `json:"alt"`
 	ThumbnailURL string `json:"thumbnailUrl,omitempty"`
 }
 
@@ -95,26 +95,26 @@ type UnresponsiveEngine struct {
 
 // SearchResponse represents the complete search response from Searxng
 type SearchResponse struct {
-	Query                string
-	NumberOfResults      int
-	Results              []SearchResult
-	Answers              []string
-	Corrections          []string
-	Infoboxes            []Infobox
-	Suggestions          []string
-	UnresponsiveEngines  []UnresponsiveEngine
+	Query               string
+	NumberOfResults     int
+	Results             []SearchResult
+	Answers             []string
+	Corrections         []string
+	Infoboxes           []Infobox
+	Suggestions         []string
+	UnresponsiveEngines []UnresponsiveEngine
 }
 
 // APIResponse is the API response format (exported for testing)
 type APIResponse struct {
-	Query                string               `json:"query"`
-	NumberOfResults      int                  `json:"number_of_results"`
-	Results              []APIResult          `json:"results"`
-	Answers              []string             `json:"answers"`
-	Corrections          []string             `json:"corrections"`
-	Infoboxes            []Infobox            `json:"infoboxes"`
-	Suggestions          []string             `json:"suggestions"`
-	UnresponsiveEngines  []UnresponsiveEngine `json:"unresponsive_engines"`
+	Query               string               `json:"query"`
+	NumberOfResults     int                  `json:"number_of_results"`
+	Results             []APIResult          `json:"results"`
+	Answers             []string             `json:"answers"`
+	Corrections         []string             `json:"corrections"`
+	Infoboxes           []Infobox            `json:"infoboxes"`
+	Suggestions         []string             `json:"suggestions"`
+	UnresponsiveEngines []UnresponsiveEngine `json:"unresponsive_engines"`
 }
 
 // parsePublishedDate parses a published date string
@@ -143,17 +143,17 @@ func parsePublishedDate(dateStr string) *time.Time {
 // toSearchResult converts an API result to a SearchResult
 func toSearchResult(r APIResult) SearchResult {
 	return SearchResult{
-		URL:          r.URL,
-		Title:        r.Title,
-		Content:      r.Content,
+		URL:           r.URL,
+		Title:         r.Title,
+		Content:       r.Content,
 		PublishedDate: parsePublishedDate(r.PublishedDate),
-		Engine:       r.Engine,
-		Category:     r.Category,
-		Score:        r.Score,
-		Thumbnail:    r.Thumbnail,
-		ImageSrc:     r.ImgSrc,
-		Engines:      r.Engines,
-		Positions:    r.Positions,
+		Engine:        r.Engine,
+		Category:      r.Category,
+		Score:         r.Score,
+		Thumbnail:     r.Thumbnail,
+		ImageSrc:      r.ImgSrc,
+		Engines:       r.Engines,
+		Positions:     r.Positions,
 	}
 }
 
@@ -165,13 +165,13 @@ func toSearchResponse(r APIResponse) SearchResponse {
 	}
 
 	return SearchResponse{
-		Query:              r.Query,
-		NumberOfResults:    r.NumberOfResults,
-		Results:            results,
-		Answers:            r.Answers,
-		Corrections:        r.Corrections,
-		Infoboxes:          r.Infoboxes,
-		Suggestions:        r.Suggestions,
+		Query:               r.Query,
+		NumberOfResults:     r.NumberOfResults,
+		Results:             results,
+		Answers:             r.Answers,
+		Corrections:         r.Corrections,
+		Infoboxes:           r.Infoboxes,
+		Suggestions:         r.Suggestions,
 		UnresponsiveEngines: r.UnresponsiveEngines,
 	}
 }

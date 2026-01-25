@@ -17,7 +17,6 @@ var (
 
 	// Config values that will be used by subcommands
 	instanceURL string
-	logLevel    string
 	timeout     time.Duration
 )
 
@@ -37,7 +36,6 @@ This server provides two main tools:
 
 		// Set config values from flags
 		instanceURL = flagInstanceURL
-		logLevel = flagLogLevel
 		timeout = flagTimeout
 
 		if instanceURL == "" {
@@ -63,7 +61,7 @@ func Execute() {
 
 func init() {
 	rootCmd.PersistentFlags().StringVar(&flagInstanceURL, "instance-url", "", "Searxng instance URL")
-	rootCmd.MarkPersistentFlagRequired("instance-url")
+	_ = rootCmd.MarkPersistentFlagRequired("instance-url")
 	rootCmd.PersistentFlags().StringVar(&flagLogLevel, "log-level", "info", "Log level: debug, info, warn, error")
 	rootCmd.PersistentFlags().DurationVar(&flagTimeout, "timeout", 30*time.Second, "Request timeout")
 }

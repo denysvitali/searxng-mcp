@@ -160,8 +160,8 @@ func TestHandleWebSearch_WithFilters(t *testing.T) {
 		NumberOfResults: 50,
 		Results: []searxng.APIResult{
 			{
-				URL:    "https://example.com/go-news",
-				Title:  "Latest Go News",
+				URL:     "https://example.com/go-news",
+				Title:   "Latest Go News",
 				Content: "Go 1.22 released",
 			},
 		},
@@ -242,7 +242,7 @@ func TestHandleWebRead(t *testing.T) {
 	// Create a test server that serves HTML
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/html")
-		w.Write([]byte(`
+		_, _ = w.Write([]byte(`
 			<html>
 				<head><title>Test Page</title></head>
 				<body>
@@ -396,8 +396,8 @@ func TestHandleWebRead_InvalidURL(t *testing.T) {
 
 func TestFormatSearchResults(t *testing.T) {
 	date := searxng.SearchResult{
-		URL:    "https://example.com/test",
-		Title:  "Test Result",
+		URL:     "https://example.com/test",
+		Title:   "Test Result",
 		Content: "Test content",
 	}
 
@@ -434,12 +434,4 @@ func TestNewServer(t *testing.T) {
 
 	assert.NotNil(t, srv)
 	assert.NotNil(t, srv.MCPServer())
-}
-
-// Helper function to create a test HTTP server
-func newTestServer(html string) *httptest.Server {
-	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "text/html")
-		w.Write([]byte(html))
-	}))
 }

@@ -26,11 +26,11 @@ var (
 
 // rateLimiter implements a simple rate limiter using a token bucket
 type rateLimiter struct {
-	mu           sync.Mutex
-	tokens       int
-	maxTokens    int
-	refillRate   time.Duration
-	lastRefill   time.Time
+	mu         sync.Mutex
+	tokens     int
+	maxTokens  int
+	refillRate time.Duration
+	lastRefill time.Time
 }
 
 // newRateLimiter creates a new rate limiter
@@ -264,13 +264,13 @@ func (c *Client) SearchJSON(ctx context.Context, req SearchRequest) (*SearchResp
 
 	// Build JSON request body
 	apiReq := APIRequest{
-		Query:      req.Query,
-		Category:   req.Category,
-		Engines:    req.Engines,
-		Language:   req.Language,
-		Pageno:     req.Page,
-		TimeRange:  req.TimeRange,
-		Format:     "json",
+		Query:     req.Query,
+		Category:  req.Category,
+		Engines:   req.Engines,
+		Language:  req.Language,
+		Pageno:    req.Page,
+		TimeRange: req.TimeRange,
+		Format:    "json",
 	}
 
 	body, err := json.Marshal(apiReq)

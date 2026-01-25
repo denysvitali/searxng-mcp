@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/denysvitali/searxng-mcp/internal/log"
-	"github.com/denysvitali/searxng-mcp/pkg/server"
 	"github.com/denysvitali/searxng-mcp/pkg/searxng"
+	"github.com/denysvitali/searxng-mcp/pkg/server"
 	"github.com/spf13/cobra"
 )
 

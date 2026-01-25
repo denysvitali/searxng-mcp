@@ -5,8 +5,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"os"
-	"path/filepath"
 	"testing"
 	"time"
 
@@ -14,12 +12,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
-
-// Helper function to load test data
-func loadTestData(filename string) ([]byte, error) {
-	path := filepath.Join("../../testdata", filename)
-	return os.ReadFile(path)
-}
 
 func TestNewClient(t *testing.T) {
 	tests := []struct {
@@ -264,7 +256,7 @@ func TestClient_Search_Retry(t *testing.T) {
 		Times(1).
 		Reply(200).
 		JSON(APIResponse{
-			Query:  "test",
+			Query:   "test",
 			Results: []APIResult{},
 		})
 
@@ -292,7 +284,7 @@ func TestClient_Search_ContextCancel(t *testing.T) {
 			Query:   "test",
 			Results: []APIResult{},
 		}
-		json.NewEncoder(w).Encode(apiResp)
+		_ = json.NewEncoder(w).Encode(apiResp)
 	}))
 	defer ts.Close()
 
@@ -414,8 +406,8 @@ func TestClient_SearchJSON(t *testing.T) {
 		NumberOfResults: 10,
 		Results: []APIResult{
 			{
-				URL:    "https://example.com/json",
-				Title:  "JSON Result",
+				URL:     "https://example.com/json",
+				Title:   "JSON Result",
 				Content: "Content",
 			},
 		},

@@ -9,10 +9,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/PuerkitoBio/goquery"
 	"github.com/JohannesKaufmann/html-to-markdown/v2/converter"
 	"github.com/JohannesKaufmann/html-to-markdown/v2/plugin/base"
 	"github.com/JohannesKaufmann/html-to-markdown/v2/plugin/commonmark"
+	"github.com/PuerkitoBio/goquery"
 	"github.com/denysvitali/searxng-mcp/internal/log"
 )
 
@@ -141,27 +141,4 @@ func cleanMarkdown(markdown string) string {
 	}
 
 	return strings.Join(cleaned, "\n")
-}
-
-// extractMainContent extracts the main content from an HTML document
-func extractMainContent(doc *goquery.Document) *goquery.Selection {
-	// Try to find the main content area
-	selectors := []string{
-		"main",
-		"[role='main']",
-		"article",
-		"#content",
-		".content",
-		"#main",
-		".main",
-		"body",
-	}
-
-	for _, selector := range selectors {
-		if sel := doc.Find(selector); sel.Length() > 0 {
-			return sel
-		}
-	}
-
-	return doc.Selection
 }
