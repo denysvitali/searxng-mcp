@@ -1,5 +1,6 @@
 # GoReleaser configuration for searxng-mcp
 project_name: searxng-mcp
+version: 2
 
 before:
   hooks:
@@ -18,7 +19,6 @@ builds:
       - arm64
     goarm:
       - '7'
-    mod_timestamp: '{{ .CommitTimestamp }}'
     ldflags:
       - -s -w
       - -X main.version={{.Version}}
@@ -35,9 +35,6 @@ archives:
       {{- else if eq .Arch "386" }}i386
       {{- else }}{{ .Arch }}{{ end }}
       {{- if .Arm }}v{{ .Arm }}{{ end }}
-    format_overrides:
-      - goos: windows
-        format: zip
 
 checksum:
   name_template: 'checksums.txt'
