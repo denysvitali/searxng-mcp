@@ -9,6 +9,33 @@ This MCP server provides two tools for AI assistants:
 - **web_search**: Search the web using Searxng and return structured results
 - **web_read**: Fetch and convert webpage content from URLs to Markdown
 
+## Installation
+
+### Go Install (Recommended)
+
+Install the latest version using Go:
+
+```bash
+go install github.com/denysvitali/searxng-mcp@latest
+```
+
+This will install the `searxng-mcp` binary to your `GOPATH/bin` directory (typically `~/go/bin/`). Make sure this directory is in your `PATH`.
+
+### Pre-built Binaries
+
+Download pre-built binaries for your platform from the [GitHub Releases](https://github.com/denysvitali/searxng-mcp/releases) page.
+
+Download the appropriate archive for your OS and architecture, extract it, and place the binary in your PATH.
+
+### From Source
+
+```bash
+git clone https://github.com/denysvitali/searxng-mcp.git
+cd searxng-mcp
+go build -o searxng-mcp ./cmd/searxng-mcp
+sudo cp searxng-mcp /usr/local/bin/
+```
+
 ## MCP Configuration
 
 ### Claude Code
@@ -23,29 +50,6 @@ Add to your `~/.claude/code/mcp.json`:
       "args": ["serve", "--searxng-url", "https://your-searxng-instance.example.com"]
     }
   }
-}
-```
-
-### Smithery
-
-Install via Smithery CLI:
-
-```bash
-npx @smithery/cli install searxng-mcp --config ~/.config/claude-code/mcp.json
-```
-
-Or use the Smithery registry at https://smithery.ai/server/searxng-mcp
-
-### Nix
-
-The package is available in nixpkgs as `searxng-mcp`. Add to your `~/.config/nix/mcpServers.nix`:
-
-```nix
-{
-  searxng = {
-    package = pkgs.searxng-mcp;
-    command = "searxng-mcp serve";
-  };
 }
 ```
 
@@ -129,27 +133,6 @@ searxng-mcp serve \
   --timeout 60s \
   --log-level debug
 ```
-
-## Installation
-
-### From Source
-
-```bash
-git clone https://github.com/denysvitali/searxng-mcp.git
-cd searxng-mcp
-go build -o searxng-mcp ./cmd/searxng-mcp
-sudo cp searxng-mcp /usr/local/bin/
-```
-
-### Using Go
-
-```bash
-go install github.com/denysvitali/searxng-mcp@latest
-```
-
-### Pre-built Releases
-
-Download binaries from the [GitHub Releases](https://github.com/denysvitali/searxng-mcp/releases) page.
 
 ## Setting Up Searxng
 
