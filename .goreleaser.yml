@@ -59,6 +59,7 @@ release:
 
 signs:
   - artifacts: checksum
+    if: "{{ .Env.GPG_FINGERPRINT != '' }}"
     args:
       - "--batch"
       - "--local-user"
