@@ -57,14 +57,3 @@ release:
   draft: false
   prerelease: auto
 
-signs:
-  - artifacts: checksum
-    if: "{{ .Env.GPG_FINGERPRINT != '' }}"
-    args:
-      - "--batch"
-      - "--local-user"
-      - "{{ .Env.GPG_FINGERPRINT }}"
-      - "--output"
-      - "${signature}"
-      - "--detach-sign"
-      - "${artifact}"
