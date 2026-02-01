@@ -208,9 +208,6 @@ func formatSearchResults(resp *searxng.SearchResponse) map[string]interface{} {
 		if r.PublishedDate != nil {
 			results[i]["published_date"] = r.PublishedDate.Format("2006-01-02")
 		}
-		if r.Thumbnail != "" {
-			results[i]["thumbnail"] = r.Thumbnail
-		}
 	}
 
 	output := map[string]interface{}{
