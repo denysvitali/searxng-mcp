@@ -11,7 +11,9 @@ var logger *logrus.Logger
 // Init initializes the global logger with the specified level
 func Init(level string) {
 	logger = logrus.New()
-	logger.SetOutput(os.Stdout)
+	// In MCP stdio mode, stdout is reserved for protocol messages.
+	// Keep logs on stderr to avoid corrupting the stream.
+	logger.SetOutput(os.Stderr)
 	logger.SetFormatter(&logrus.TextFormatter{
 		FullTimestamp:   true,
 		TimestampFormat: "2006-01-02 15:04:05",
