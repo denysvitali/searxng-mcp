@@ -1,0 +1,16 @@
+{
+  "title": "PR title",
+  "state": "open",
+  "body": "PR description.",
+  "html_url": "https://github.com/example/repo/pull/10",
+  "created_at": "2025-01-01T10:00:00Z",
+  "updated_at": "2025-01-02T11:00:00Z",
+  "user": {
+    "login": "pr-author"
+  },
+  "labels": [
+    {
+      "name": "enhancement"
+    }
+  ]
+}
