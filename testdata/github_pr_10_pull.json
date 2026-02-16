@@ -1,0 +1,15 @@
+{
+  "draft": false,
+  "merged": false,
+  "commits": 2,
+  "additions": 30,
+  "deletions": 10,
+  "changed_files": 4,
+  "updated_at": "2025-01-03T15:00:00Z",
+  "base": {
+    "ref": "main"
+  },
+  "head": {
+    "ref": "feature-branch"
+  }
+}

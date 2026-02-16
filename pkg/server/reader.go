@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"slices"
 	"strings"
 	"time"
 
@@ -16,60 +17,93 @@ import (
 	"github.com/denysvitali/searxng-mcp/internal/log"
 )
 
-// fetchURLContent fetches content from a URL and converts it to Markdown
-func fetchURLContent(ctx context.Context, urlStr string) (string, error) {
-	// Validate URL
-	parsedURL, err := url.Parse(urlStr)
-	if err != nil {
-		return "", fmt.Errorf("invalid URL: %w", err)
-	}
+const (
+	defaultUserAgent     = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+	defaultAccept        = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+	defaultAcceptLang    = "en-US,en;q=0.9"
+	defaultHTTPTimeout   = 30 * time.Second
+	maxHTTPRedirectCount = 10
+)
 
-	if parsedURL.Scheme != "http" && parsedURL.Scheme != "https" {
-		return "", fmt.Errorf("unsupported URL scheme: %s (only http and https are supported)", parsedURL.Scheme)
+var supportedSchemes = []string{"http", "https"}
+
+// fetchURLContent fetches content from a URL and converts it to Markdown.
+func fetchURLContent(ctx context.Context, urlStr string) (string, error) {
+	parsedURL, err := validateURL(urlStr)
+	if err != nil {
+		return "", err
 	}
 
 	log.WithField("url", urlStr).Debug("fetching URL")
 
-	// Create HTTP request
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, urlStr, nil)
+	client := newHTTPClient()
+	if isRedditThreadURL(parsedURL) {
+		return fetchRedditContentAsMarkdown(ctx, client, parsedURL)
+	}
+	if isGitHubIssueOrPRURL(parsedURL) {
+		return fetchGitHubContentAsMarkdown(ctx, client, parsedURL)
+	}
+
+	return fetchGenericHTMLAsMarkdown(ctx, client, parsedURL.String())
+}
+
+func validateURL(urlStr string) (*url.URL, error) {
+	parsedURL, err := url.Parse(urlStr)
 	if err != nil {
-		return "", fmt.Errorf("failed to create request: %w", err)
+		return nil, fmt.Errorf("invalid URL: %w", err)
 	}
+	if !slices.Contains(supportedSchemes, parsedURL.Scheme) {
+		return nil, fmt.Errorf("unsupported URL scheme: %s (only http and https are supported)", parsedURL.Scheme)
+	}
+	return parsedURL, nil
+}
 
-	// Set headers to appear as a regular browser
-	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
-	req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
-	req.Header.Set("Accept-Language", "en-US,en;q=0.9")
-
-	// Create HTTP client with timeout
+func newHTTPClient() *http.Client {
 	client := &http.Client{
-		Timeout: 30 * time.Second,
+		Timeout: defaultHTTPTimeout,
 	}
-
-	// Follow redirects
 	client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
-		if len(via) >= 10 {
+		if len(via) >= maxHTTPRedirectCount {
 			return fmt.Errorf("too many redirects")
 		}
 		return nil
 	}
+	return client
+}
 
-	// Execute request
+func newRequest(ctx context.Context, urlStr, accept string) (*http.Request, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, urlStr, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create request: %w", err)
+	}
+	req.Header.Set("User-Agent", defaultUserAgent)
+	req.Header.Set("Accept-Language", defaultAcceptLang)
+	if accept != "" {
+		req.Header.Set("Accept", accept)
+	} else {
+		req.Header.Set("Accept", defaultAccept)
+	}
+	return req, nil
+}
+
+func fetchGenericHTMLAsMarkdown(ctx context.Context, client *http.Client, urlStr string) (string, error) {
+	req, err := newRequest(ctx, urlStr, defaultAccept)
+	if err != nil {
+		return "", err
+	}
+
 	resp, err := client.Do(req)
 	if err != nil {
 		return "", fmt.Errorf("HTTP request failed: %w", err)
 	}
 	defer resp.Body.Close()
 
-	// Check status code
 	if resp.StatusCode != http.StatusOK {
 		return "", fmt.Errorf("HTTP %d: %s", resp.StatusCode, resp.Status)
 	}
 
-	// Check content type
 	contentType := resp.Header.Get("Content-Type")
 	if !strings.Contains(contentType, "text/html") && !strings.Contains(contentType, "application/xhtml") {
-		// Return plain text for non-HTML content
 		body, err := io.ReadAll(resp.Body)
 		if err != nil {
 			return "", fmt.Errorf("failed to read response body: %w", err)
@@ -77,24 +111,19 @@ func fetchURLContent(ctx context.Context, urlStr string) (string, error) {
 		return string(body), nil
 	}
 
-	// Parse HTML
 	doc, err := goquery.NewDocumentFromReader(resp.Body)
 	if err != nil {
 		return "", fmt.Errorf("failed to parse HTML: %w", err)
 	}
-
-	// Remove script and style elements
 	doc.Find("script, style, nav, footer, header, aside").Each(func(i int, s *goquery.Selection) {
 		s.Remove()
 	})
 
-	// Get the HTML content
 	html, err := doc.Html()
 	if err != nil {
 		return "", fmt.Errorf("failed to serialize HTML: %w", err)
 	}
 
-	// Convert to Markdown using html-to-markdown v2 API
 	conv := converter.NewConverter(
 		converter.WithPlugins(
 			base.NewBasePlugin(),
@@ -106,10 +135,23 @@ func fetchURLContent(ctx context.Context, urlStr string) (string, error) {
 		return "", fmt.Errorf("failed to convert to Markdown: %w", err)
 	}
 
-	// Clean up the markdown
-	markdown = cleanMarkdown(markdown)
+	return cleanMarkdown(markdown), nil
+}
 
-	return markdown, nil
+func pathSegments(path string) []string {
+	trimmed := strings.Trim(path, "/")
+	if trimmed == "" {
+		return nil
+	}
+	parts := strings.Split(trimmed, "/")
+	segments := make([]string, 0, len(parts))
+	for _, part := range parts {
+		if part == "" {
+			continue
+		}
+		segments = append(segments, part)
+	}
+	return segments
 }
 
 // cleanMarkdown cleans up the converted markdown

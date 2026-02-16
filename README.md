@@ -8,6 +8,8 @@ This MCP server provides two tools for AI assistants:
 
 - **web_search**: Search the web using Searxng and return structured results
 - **web_read**: Fetch and convert webpage content from URLs to Markdown
+  - Reddit thread URLs are fetched through Reddit's JSON endpoint and rendered as readable Markdown
+  - GitHub issue/PR URLs are fetched via GitHub API endpoints (issue/PR data + comments) and rendered as structured Markdown
 
 ## Installation
 
@@ -83,6 +85,11 @@ Search the web using Searxng and return limited results.
 ### web_read
 
 Fetch and read content from a URL, converting HTML to Markdown.
+
+Specialized behavior:
+- Reddit thread URLs (`reddit.com/.../comments/...`) use the `.json` endpoint for better content extraction.
+- GitHub issue/PR URLs (`github.com/{owner}/{repo}/issues/{n}` and `.../pull/{n}`) use GitHub API data and include comments in the rendered Markdown.
+- All other URLs use generic HTML-to-Markdown conversion.
 
 **Parameters:**
 
