@@ -16,4 +16,3 @@ func TestInit_LogsToStderr(t *testing.T) {
 		t.Fatal("logger output must not be os.Stdout")
 	}
 }
-
