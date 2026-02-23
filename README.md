@@ -18,7 +18,7 @@ This MCP server provides two tools for AI assistants:
 Install the latest version using Go:
 
 ```bash
-go install github.com/denysvitali/searxng-mcp@latest
+go install github.com/denysvitali/searxng-mcp/cmd/searxng-mcp@v0.0.7
 ```
 
 This will install the `searxng-mcp` binary to your `GOPATH/bin` directory (typically `~/go/bin/`). Make sure this directory is in your `PATH`.
@@ -42,17 +42,10 @@ sudo cp searxng-mcp /usr/local/bin/
 
 ### Claude Code
 
-Add to your `~/.claude/code/mcp.json`:
+Add the MCP server using the Claude CLI:
 
-```json
-{
-  "mcpServers": {
-    "searxng": {
-      "command": "searxng-mcp",
-      "args": ["serve", "--searxng-url", "https://your-searxng-instance.example.com"]
-    }
-  }
-}
+```bash
+claude mcp add searxng --scope user -- searxng-mcp serve --instance-url https://your-searxng-instance.example.com
 ```
 
 ## Tool Reference
@@ -111,7 +104,7 @@ Specialized behavior:
 
 | Flag | Env Variable | Default | Description |
 |------|--------------|---------|-------------|
-| `--searxng-url` | `SEARXNG_URL` | `https://searxng.example.com` | Searxng instance base URL |
+| `--instance-url` | `SEARXNG_URL` | `https://searxng.example.com` | Searxng instance base URL |
 | `--log-level` | `LOG_LEVEL` | `info` | Log level: debug, info, warn, error |
 | `--timeout` | `SEARXNG_TIMEOUT` | `30s` | HTTP request timeout |
 
@@ -136,7 +129,7 @@ Using command line flags:
 
 ```bash
 searxng-mcp serve \
-  --searxng-url "https://searxng.example.com" \
+  --instance-url "https://searxng.example.com" \
   --timeout 60s \
   --log-level debug
 ```
@@ -156,7 +149,7 @@ docker run -d \
 Then configure the base URL in the MCP server:
 
 ```bash
-searxng-mcp serve --searxng-url "http://localhost:8080"
+searxng-mcp serve --instance-url "http://localhost:8080"
 ```
 
 ## License
