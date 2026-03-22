@@ -240,5 +240,16 @@ func formatSearchResults(resp *searxng.SearchResponse) map[string]interface{} {
 		output["corrections"] = corrections
 	}
 
+	if len(resp.UnresponsiveEngines) > 0 {
+		engines := make([]map[string]string, len(resp.UnresponsiveEngines))
+		for i, e := range resp.UnresponsiveEngines {
+			engines[i] = map[string]string{
+				"name":  e.Name,
+				"error": e.Error,
+			}
+		}
+		output["unresponsive_engines"] = engines
+	}
+
 	return output
 }

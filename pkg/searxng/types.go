@@ -180,24 +180,38 @@ func toSearchResponse(r APIResponse) SearchResponse {
 }
 
 // safeParseUnresponsiveEngines parses the unresponsive_engines field safely
-// It handles null, empty array, single object, or array of objects
+// SearXNG returns this as an array of 2-element arrays: [["engine_name", "error_message"], ...]
 func safeParseUnresponsiveEngines(raw json.RawMessage) []UnresponsiveEngine {
-	if len(raw) == 0 {
+	if len(raw) == 0 || string(raw) == "null" {
 		return nil
 	}
 
-	// Try to unmarshal as array first
+	// SearXNG format: array of [name, error] tuples
+	var tuples [][]string
+	if err := json.Unmarshal(raw, &tuples); err == nil {
+		if tuples == nil {
+			return nil
+		}
+		engines := make([]UnresponsiveEngine, 0, len(tuples))
+		for _, t := range tuples {
+			if len(t) >= 2 {
+				engines = append(engines, UnresponsiveEngine{Name: t[0], Error: t[1]})
+			}
+		}
+		return engines
+	}
+
+	// Fallback: try as array of objects
 	var engines []UnresponsiveEngine
 	if err := json.Unmarshal(raw, &engines); err == nil {
 		return engines
 	}
 
-	// If that fails, try single object (edge case if Searxng behaves oddly)
+	// Fallback: try single object
 	var single UnresponsiveEngine
 	if err := json.Unmarshal(raw, &single); err == nil {
 		return []UnresponsiveEngine{single}
 	}
 
-	// If both fail, return nil
 	return nil
 }

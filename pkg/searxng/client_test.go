@@ -580,3 +580,47 @@ func TestClient_Search_UnresponsiveEnginesMultiple(t *testing.T) {
 	assert.Equal(t, "duckduckgo", resp.UnresponsiveEngines[2].Name)
 	assert.Equal(t, "Network error", resp.UnresponsiveEngines[2].Error)
 }
+
+func TestClient_Search_UnresponsiveEnginesTupleFormat(t *testing.T) {
+	defer gock.OffAll()
+
+	// Test with real SearXNG format: array of [name, error] tuples
+	mockResponse := `{
+		"query": "test",
+		"number_of_results": 0,
+		"results": [],
+		"answers": [],
+		"corrections": [],
+		"infoboxes": [],
+		"suggestions": [],
+		"unresponsive_engines": [
+			["brave", "too many requests"],
+			["duckduckgo", "CAPTCHA"],
+			["google", "access denied"]
+		]
+	}`
+
+	gock.New("https://searxng.example.com").
+		Get("/search").
+		MatchParam("q", "test").
+		MatchParam("format", "json").
+		Reply(200).
+		BodyString(mockResponse)
+
+	config := DefaultConfig()
+	client, err := NewClient(config)
+	require.NoError(t, err)
+
+	ctx := context.Background()
+	resp, err := client.Search(ctx, SearchRequest{Query: "test"})
+
+	require.NoError(t, err)
+	assert.NotNil(t, resp)
+	require.Len(t, resp.UnresponsiveEngines, 3)
+	assert.Equal(t, "brave", resp.UnresponsiveEngines[0].Name)
+	assert.Equal(t, "too many requests", resp.UnresponsiveEngines[0].Error)
+	assert.Equal(t, "duckduckgo", resp.UnresponsiveEngines[1].Name)
+	assert.Equal(t, "CAPTCHA", resp.UnresponsiveEngines[1].Error)
+	assert.Equal(t, "google", resp.UnresponsiveEngines[2].Name)
+	assert.Equal(t, "access denied", resp.UnresponsiveEngines[2].Error)
+}
