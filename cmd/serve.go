@@ -10,6 +10,7 @@ import (
 	"github.com/denysvitali/searxng-mcp/pkg/server"
 	mcpserver "github.com/mark3labs/mcp-go/server"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 var (
@@ -36,6 +37,9 @@ Examples:
   # Start in HTTP mode
   searxng-mcp serve --transport http --port 8080`,
 	PreRunE: func(cmd *cobra.Command, args []string) error {
+		flagTransport = viper.GetString("transport")
+		flagPort = viper.GetInt("port")
+
 		if flagTransport != "stdio" && flagTransport != "http" {
 			return fmt.Errorf("invalid transport: %s (must be 'stdio' or 'http')", flagTransport)
 		}
@@ -94,4 +98,7 @@ func init() {
 
 	serveCmd.Flags().StringVarP(&flagTransport, "transport", "t", "stdio", "Transport type: stdio or http")
 	serveCmd.Flags().IntVarP(&flagPort, "port", "p", 8080, "Port for HTTP transport")
+
+	viper.BindPFlag("transport", serveCmd.Flags().Lookup("transport"))
+	viper.BindPFlag("port", serveCmd.Flags().Lookup("port"))
 }
