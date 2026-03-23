@@ -18,17 +18,23 @@ type Server struct {
 	searxngClient *searxng.Client
 }
 
-// New creates a new MCP server
-func New(client *searxng.Client) *Server {
+// New creates a new MCP server. Extra mcpserver.ServerOptions (e.g. tracing
+// middleware) can be appended via extraOpts.
+func New(client *searxng.Client, extraOpts ...mcpserver.ServerOption) *Server {
 	s := &Server{
 		searxngClient: client,
 	}
 
 	// Create MCP server
+	opts := []mcpserver.ServerOption{
+		mcpserver.WithToolCapabilities(true),
+	}
+	opts = append(opts, extraOpts...)
+
 	mcpServer := mcpserver.NewMCPServer(
 		"searxng-mcp",
 		"1.0.0",
-		mcpserver.WithToolCapabilities(true),
+		opts...,
 	)
 
 	s.mcpServer = mcpServer

@@ -1,11 +1,14 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/denysvitali/searxng-mcp/internal/log"
+	"github.com/denysvitali/searxng-mcp/internal/tracing"
 	"github.com/denysvitali/searxng-mcp/pkg/searxng"
 	"github.com/denysvitali/searxng-mcp/pkg/server"
+	mcpserver "github.com/mark3labs/mcp-go/server"
 	"github.com/spf13/cobra"
 )
 
@@ -42,6 +45,17 @@ Examples:
 		return nil
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
+		// Initialize tracing (no-op when SENTRY_DSN / OTEL_EXPORTER_OTLP_ENDPOINT are unset)
+		ctx := context.Background()
+		if err := tracing.Init(ctx); err != nil {
+			return fmt.Errorf("failed to initialize tracing: %w", err)
+		}
+		defer tracing.Shutdown(ctx) //nolint:errcheck
+
+		if tracing.Enabled() {
+			log.Info("tracing enabled")
+		}
+
 		// Create Searxng client config
 		config := &searxng.Config{
 			BaseURL: instanceURL,
@@ -56,8 +70,12 @@ Examples:
 
 		log.WithField("transport", flagTransport).Info("starting MCP server")
 
+		// Build MCP server options (tracing middleware, hooks, etc.)
+		var mcpOpts []mcpserver.ServerOption
+		mcpOpts = append(mcpOpts, tracing.MCPServerOptions(flagTransport)...)
+
 		// Create and start server
-		srv := server.New(client)
+		srv := server.New(client, mcpOpts...)
 
 		switch flagTransport {
 		case "http":
