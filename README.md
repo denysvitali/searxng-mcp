@@ -18,7 +18,7 @@ This MCP server provides two tools for AI assistants:
 Install the latest version using Go:
 
 ```bash
-go install github.com/denysvitali/searxng-mcp/cmd/searxng-mcp@v0.0.7
+go install github.com/denysvitali/searxng-mcp@v0.0.7
 ```
 
 This will install the `searxng-mcp` binary to your `GOPATH/bin` directory (typically `~/go/bin/`). Make sure this directory is in your `PATH`.
@@ -34,7 +34,7 @@ Download the appropriate archive for your OS and architecture, extract it, and p
 ```bash
 git clone https://github.com/denysvitali/searxng-mcp.git
 cd searxng-mcp
-go build -o searxng-mcp ./cmd/searxng-mcp
+go build -o searxng-mcp .
 sudo cp searxng-mcp /usr/local/bin/
 ```
 

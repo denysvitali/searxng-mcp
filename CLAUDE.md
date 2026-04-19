@@ -4,20 +4,20 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Commands
 
-- Build: `go build ./cmd/searxng-mcp`
+- Build: `go build .`
 - Run all unit tests: `go test ./...`
 - Run a single test: `go test ./pkg/server -run TestName -v`
 - Integration tests (hit a real Searxng instance, gated by build tag): `go test -tags=integration ./... -run TestIntegration_` (set `SEARXNG_INSTANCE_URL` to override the default target)
 - Lint (matches CI): `golangci-lint run ./...`
 - Formatting (CI fails if either reports anything): `gofmt -l .` and `goimports -l .`
 - Snapshot release build: `goreleaser build --snapshot --clean`
-- Run locally: `go run ./cmd/searxng-mcp serve --instance-url https://your-searxng-instance`
+- Run locally: `go run . serve --instance-url https://your-searxng-instance`
 
 CI runs the `test` matrix against Go 1.24 and 1.25; `lint` and `goreleaser build` run on 1.25.
 
 ## Architecture
 
-Single Cobra/Viper binary that exposes a Searxng-backed MCP server. Entry point is `cmd/searxng-mcp/main.go`, which calls `cmd.Execute()`.
+Single Cobra/Viper binary that exposes a Searxng-backed MCP server. Entry point is `main.go` at the repo root, which calls `cmd.Execute()`.
 
 Layers:
 

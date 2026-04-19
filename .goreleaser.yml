@@ -24,7 +24,7 @@ builds:
       - -X main.version={{.Version}}
       - -X main.commit={{.Commit}}
       - -X main.date={{.Date}}
-    main: ./cmd/searxng-mcp
+    main: .
     binary: searxng-mcp
 
 archives:
