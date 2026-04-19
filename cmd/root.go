@@ -68,21 +68,21 @@ func init() {
 	rootCmd.PersistentFlags().DurationVar(&flagTimeout, "timeout", 30*time.Second, "Request timeout")
 
 	// Bind flags to viper
-	viper.BindPFlag("instance-url", rootCmd.PersistentFlags().Lookup("instance-url"))
-	viper.BindPFlag("log-level", rootCmd.PersistentFlags().Lookup("log-level"))
-	viper.BindPFlag("timeout", rootCmd.PersistentFlags().Lookup("timeout"))
+	_ = viper.BindPFlag("instance-url", rootCmd.PersistentFlags().Lookup("instance-url"))
+	_ = viper.BindPFlag("log-level", rootCmd.PersistentFlags().Lookup("log-level"))
+	_ = viper.BindPFlag("timeout", rootCmd.PersistentFlags().Lookup("timeout"))
 
 	// Bind environment variables (legacy support)
-	viper.BindEnv("instance-url", "SEARXNG_URL")
-	viper.BindEnv("timeout", "SEARXNG_TIMEOUT")
-	viper.BindEnv("log-level", "LOG_LEVEL")
+	_ = viper.BindEnv("instance-url", "SEARXNG_URL")
+	_ = viper.BindEnv("timeout", "SEARXNG_TIMEOUT")
+	_ = viper.BindEnv("log-level", "LOG_LEVEL")
 
 	// Tracing env vars — these are read directly by the tracing package,
 	// but we also bind them so they can be set in the config file.
-	viper.BindEnv("sentry-dsn", "SENTRY_DSN")
-	viper.BindEnv("sentry-traces-sample-rate", "SENTRY_TRACES_SAMPLE_RATE")
-	viper.BindEnv("otel-exporter-otlp-endpoint", "OTEL_EXPORTER_OTLP_ENDPOINT")
-	viper.BindEnv("otel-exporter-otlp-headers", "OTEL_EXPORTER_OTLP_HEADERS")
+	_ = viper.BindEnv("sentry-dsn", "SENTRY_DSN")
+	_ = viper.BindEnv("sentry-traces-sample-rate", "SENTRY_TRACES_SAMPLE_RATE")
+	_ = viper.BindEnv("otel-exporter-otlp-endpoint", "OTEL_EXPORTER_OTLP_ENDPOINT")
+	_ = viper.BindEnv("otel-exporter-otlp-headers", "OTEL_EXPORTER_OTLP_HEADERS")
 }
 
 func initConfig() {

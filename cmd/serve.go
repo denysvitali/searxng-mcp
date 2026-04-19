@@ -99,6 +99,6 @@ func init() {
 	serveCmd.Flags().StringVarP(&flagTransport, "transport", "t", "stdio", "Transport type: stdio or http")
 	serveCmd.Flags().IntVarP(&flagPort, "port", "p", 8080, "Port for HTTP transport")
 
-	viper.BindPFlag("transport", serveCmd.Flags().Lookup("transport"))
-	viper.BindPFlag("port", serveCmd.Flags().Lookup("port"))
+	_ = viper.BindPFlag("transport", serveCmd.Flags().Lookup("transport"))
+	_ = viper.BindPFlag("port", serveCmd.Flags().Lookup("port"))
 }
