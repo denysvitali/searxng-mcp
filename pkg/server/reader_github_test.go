@@ -67,6 +67,45 @@ func TestFetchURLContent_GitHubIssueMarkdown(t *testing.T) {
 	assert.True(t, gock.IsDone(), "expected all mocked GitHub endpoints to be called")
 }
 
+func TestFetchURLContent_GitHubRepoMarkdown(t *testing.T) {
+	defer gock.OffAll()
+
+	gock.New("https://api.github.com").
+		Get("/repos/denysvitali/searxng-mcp").
+		Reply(200).
+		JSON(map[string]interface{}{
+			"full_name":         "denysvitali/searxng-mcp",
+			"description":       "MCP server for Searxng",
+			"html_url":          "https://github.com/denysvitali/searxng-mcp",
+			"homepage":          "",
+			"stargazers_count":  2,
+			"forks_count":       1,
+			"open_issues_count": 0,
+			"language":          "Go",
+			"topics":            []string{"mcp", "searxng"},
+			"archived":          false,
+			"default_branch":    "master",
+			"license":           map[string]interface{}{"spdx_id": "MIT"},
+		})
+
+	gock.New("https://api.github.com").
+		Get("/repos/denysvitali/searxng-mcp/readme").
+		Reply(200).
+		BodyString("# searxng-mcp\n\nA test README.")
+
+	markdown, err := fetchURLContent(context.Background(), "https://github.com/denysvitali/searxng-mcp")
+	require.NoError(t, err)
+	assert.Contains(t, markdown, "# denysvitali/searxng-mcp")
+	assert.Contains(t, markdown, "MCP server for Searxng")
+	assert.Contains(t, markdown, "- Primary language: Go")
+	assert.Contains(t, markdown, "- Stars: 2")
+	assert.Contains(t, markdown, "- License: MIT")
+	assert.Contains(t, markdown, "- Topics: mcp, searxng")
+	assert.Contains(t, markdown, "## README")
+	assert.Contains(t, markdown, "A test README.")
+	assert.True(t, gock.IsDone(), "expected all mocked GitHub endpoints to be called")
+}
+
 func TestFetchGitHubThread_PullRequestIncludesReviewComments(t *testing.T) {
 	defer gock.OffAll()
 

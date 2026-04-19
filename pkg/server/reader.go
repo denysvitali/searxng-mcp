@@ -43,6 +43,9 @@ func fetchURLContent(ctx context.Context, urlStr string) (string, error) {
 	if isGitHubIssueOrPRURL(parsedURL) {
 		return fetchGitHubContentAsMarkdown(ctx, client, parsedURL)
 	}
+	if isGitHubRepoURL(parsedURL) {
+		return fetchGitHubRepoAsMarkdown(ctx, client, parsedURL)
+	}
 
 	return fetchGenericHTMLAsMarkdown(ctx, client, parsedURL.String())
 }

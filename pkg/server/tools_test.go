@@ -425,6 +425,20 @@ func TestFormatSearchResults(t *testing.T) {
 	assert.Equal(t, "Test content", results[0]["snippet"])
 }
 
+func TestFormatSearchResults_FallbackTotal(t *testing.T) {
+	resp := &searxng.SearchResponse{
+		Query:           "q",
+		NumberOfResults: 0,
+		Results: []searxng.SearchResult{
+			{URL: "https://a", Title: "a"},
+			{URL: "https://b", Title: "b"},
+		},
+	}
+
+	result := formatSearchResults(resp)
+	assert.Equal(t, float64(2), result["total_results"])
+}
+
 func TestNewServer(t *testing.T) {
 	config := searxng.DefaultConfig()
 	client, err := searxng.NewClient(config)

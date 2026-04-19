@@ -216,9 +216,13 @@ func formatSearchResults(resp *searxng.SearchResponse) map[string]interface{} {
 		}
 	}
 
+	total := resp.NumberOfResults
+	if total == 0 {
+		total = len(resp.Results)
+	}
 	output := map[string]interface{}{
 		"query":         resp.Query,
-		"total_results": float64(resp.NumberOfResults),
+		"total_results": float64(total),
 		"results":       results,
 	}
 

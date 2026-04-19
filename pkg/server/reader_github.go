@@ -134,6 +134,116 @@ func isGitHubIssueOrPRURL(parsedURL *url.URL) bool {
 	return ok
 }
 
+func isGitHubRepoURL(parsedURL *url.URL) bool {
+	if strings.ToLower(parsedURL.Hostname()) != "github.com" {
+		return false
+	}
+	segments := pathSegments(parsedURL.Path)
+	return len(segments) == 2
+}
+
+type gitHubRepoResponse struct {
+	FullName      string   `json:"full_name"`
+	Description   string   `json:"description"`
+	HTMLURL       string   `json:"html_url"`
+	Homepage      string   `json:"homepage"`
+	Stars         int      `json:"stargazers_count"`
+	Forks         int      `json:"forks_count"`
+	OpenIssues    int      `json:"open_issues_count"`
+	Language      string   `json:"language"`
+	Topics        []string `json:"topics"`
+	Archived      bool     `json:"archived"`
+	DefaultBranch string   `json:"default_branch"`
+	License       *struct {
+		SPDXID string `json:"spdx_id"`
+	} `json:"license"`
+}
+
+func fetchGitHubRepoAsMarkdown(ctx context.Context, client *http.Client, parsedURL *url.URL) (string, error) {
+	segments := pathSegments(parsedURL.Path)
+	owner, repo := segments[0], segments[1]
+
+	var repoResp gitHubRepoResponse
+	repoEndpoint := fmt.Sprintf("%s/repos/%s/%s", gitHubAPIBaseURL, owner, repo)
+	if err := fetchGitHubJSON(ctx, client, repoEndpoint, &repoResp); err != nil {
+		return "", err
+	}
+
+	readme, _ := fetchGitHubReadme(ctx, client, owner, repo)
+
+	var b strings.Builder
+	fullName := repoResp.FullName
+	if fullName == "" {
+		fullName = fmt.Sprintf("%s/%s", owner, repo)
+	}
+	fmt.Fprintf(&b, "# %s\n\n", fullName)
+	if strings.TrimSpace(repoResp.Description) != "" {
+		fmt.Fprintf(&b, "%s\n\n", repoResp.Description)
+	}
+
+	b.WriteString("## Repository Info\n\n")
+	if repoResp.HTMLURL != "" {
+		fmt.Fprintf(&b, "- Link: %s\n", repoResp.HTMLURL)
+	}
+	if repoResp.Homepage != "" {
+		fmt.Fprintf(&b, "- Homepage: %s\n", repoResp.Homepage)
+	}
+	if repoResp.Language != "" {
+		fmt.Fprintf(&b, "- Primary language: %s\n", repoResp.Language)
+	}
+	fmt.Fprintf(&b, "- Stars: %d\n", repoResp.Stars)
+	fmt.Fprintf(&b, "- Forks: %d\n", repoResp.Forks)
+	fmt.Fprintf(&b, "- Open issues: %d\n", repoResp.OpenIssues)
+	if repoResp.DefaultBranch != "" {
+		fmt.Fprintf(&b, "- Default branch: %s\n", repoResp.DefaultBranch)
+	}
+	if repoResp.License != nil && repoResp.License.SPDXID != "" && repoResp.License.SPDXID != "NOASSERTION" {
+		fmt.Fprintf(&b, "- License: %s\n", repoResp.License.SPDXID)
+	}
+	if repoResp.Archived {
+		b.WriteString("- Archived: true\n")
+	}
+	if len(repoResp.Topics) > 0 {
+		fmt.Fprintf(&b, "- Topics: %s\n", strings.Join(repoResp.Topics, ", "))
+	}
+	b.WriteString("\n")
+
+	b.WriteString("## README\n\n")
+	if strings.TrimSpace(readme) == "" {
+		b.WriteString("_No README available._\n")
+	} else {
+		b.WriteString(strings.TrimSpace(readme))
+		b.WriteString("\n")
+	}
+
+	return b.String(), nil
+}
+
+func fetchGitHubReadme(ctx context.Context, client *http.Client, owner, repo string) (string, error) {
+	endpoint := fmt.Sprintf("%s/repos/%s/%s/readme", gitHubAPIBaseURL, owner, repo)
+	req, err := newRequest(ctx, endpoint, "application/vnd.github.raw")
+	if err != nil {
+		return "", err
+	}
+	req.Header.Set("X-GitHub-Api-Version", "2022-11-28")
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", fmt.Errorf("GitHub README request failed: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("GitHub README request failed: HTTP %d", resp.StatusCode)
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", fmt.Errorf("failed to read README body: %w", err)
+	}
+	return string(body), nil
+}
+
 func fetchGitHubContentAsMarkdown(ctx context.Context, client *http.Client, parsedURL *url.URL) (string, error) {
 	thread, err := fetchGitHubThread(ctx, client, parsedURL)
 	if err != nil {
