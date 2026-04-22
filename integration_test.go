@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/denysvitali/searxng-mcp/pkg/searxng"
 	"github.com/stretchr/testify/assert"
@@ -250,8 +251,8 @@ func TestIntegration_ResponseFeatures(t *testing.T) {
 	assert.NotNil(t, resp.Corrections)
 }
 
-func defaultTimeout() int {
-	return 30
+func defaultTimeout() time.Duration {
+	return 30 * time.Second
 }
 
 // Test the Client creation with real instance
