@@ -9,6 +9,7 @@ import (
 
 	"github.com/getsentry/sentry-go"
 	sentryotel "github.com/getsentry/sentry-go/otel"
+	sentryotlp "github.com/getsentry/sentry-go/otel/otlp"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
 	"go.opentelemetry.io/otel/propagation"
@@ -73,12 +74,18 @@ func Init(ctx context.Context) error {
 			Dsn:              sentryDSN,
 			EnableTracing:    true,
 			TracesSampleRate: sampleRate,
+			Integrations: func(integrations []sentry.Integration) []sentry.Integration {
+				return append(integrations, sentryotel.NewOtelIntegration())
+			},
 		}); err != nil {
 			return fmt.Errorf("sentry init: %w", err)
 		}
 
-		opts = append(opts, sdktrace.WithSpanProcessor(sentryotel.NewSentrySpanProcessor()))
-		propagators = append(propagators, sentryotel.NewSentryPropagator())
+		exporter, err := sentryotlp.NewTraceExporter(ctx, sentryDSN)
+		if err != nil {
+			return fmt.Errorf("sentryotlp.NewTraceExporter: %w", err)
+		}
+		opts = append(opts, sdktrace.WithBatcher(exporter))
 	}
 
 	if otlpEndpoint != "" {
