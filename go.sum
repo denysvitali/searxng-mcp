@@ -21,6 +21,8 @@ github.com/getsentry/sentry-go v0.46.0 h1:mbdDaarbUdOt9X+dx6kDdntkShLEX3/+KyOsVD
 github.com/getsentry/sentry-go v0.46.0/go.mod h1:evVbw2qotNUdYG8KxXbAdjOQWWvWIwKxpjdZZIvcIPw=
 github.com/getsentry/sentry-go/otel v0.45.1 h1:5webrHsH+Re3H2RFg40AC5GELIfUhNbfXth6UY9jZGE=
 github.com/getsentry/sentry-go/otel v0.45.1/go.mod h1:SnY1Vx97HQm1B8z9I4FJig8UNP6wmExGoIjn9T1khIM=
+github.com/getsentry/sentry-go/otel v0.46.0 h1:a5p/9WiuArdJZ6514fHdaePbpcHEYAIxVqisNM+F66s=
+github.com/getsentry/sentry-go/otel v0.46.0/go.mod h1:CDdhumXUsxtKcsl+x/pQTsNNdy1Y6XsbGhJWXZVK/II=
 github.com/getsentry/sentry-go/otel/otlp v0.46.0 h1:xOUQslhBSaU1N6FtfSNICd1zC+suMFAnWWp1yfANwTA=
 github.com/getsentry/sentry-go/otel/otlp v0.46.0/go.mod h1:2Pv7eU90TAInDjyZWzG033CBuDzd4jW1VsjaE4rEHYs=
 github.com/go-errors/errors v1.4.2 h1:J6MZopCL4uSllY1OfXM374weqZFFItUbrImctkmUxIA=
@@ -55,6 +57,8 @@ github.com/kr/text v0.2.0 h1:5Nx0Ya0ZqY2ygV366QzturHI13Jq95ApcVaJBhpS+AY=
 github.com/kr/text v0.2.0/go.mod h1:eLer722TekiGuMkidMxC/pM04lWEeraHUUmBw8l2grE=
 github.com/mark3labs/mcp-go v0.48.0 h1:o+MXuGW/HCeR2ny5LcAcZQn2bo6I2xaZMEHnpRG+dtw=
 github.com/mark3labs/mcp-go v0.48.0/go.mod h1:JKTC7R2LLVagkEWK7Kwu7DbmA6iIvnNAod6yrHiQMag=
+github.com/mark3labs/mcp-go v0.49.0 h1:7Ssx4d7/T86qnWoJIdye7wEEvUzv39UIbnZb/FqUZMY=
+github.com/mark3labs/mcp-go v0.49.0/go.mod h1:BflTAZAzXlrTpiO44gmjMu89n2FO56rJ9m31fp4zd5k=
 github.com/nbio/st v0.0.0-20140626010706-e9e8d9816f32 h1:W6apQkHrMkS0Muv8G/TipAy/FJl/rCYT0+EuS8+Z0z4=
 github.com/nbio/st v0.0.0-20140626010706-e9e8d9816f32/go.mod h1:9wM+0iRr9ahx58uYLpLIr5fm8diHn0JbqRycJi6w0Ms=
 github.com/pelletier/go-toml/v2 v2.2.4 h1:mye9XuhQ6gvn5h28+VilKrrPoQVanw5PMw/TB0t5Ec4=

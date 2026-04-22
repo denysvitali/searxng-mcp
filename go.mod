@@ -6,10 +6,10 @@ require (
 	github.com/JohannesKaufmann/html-to-markdown/v2 v2.5.0
 	github.com/PuerkitoBio/goquery v1.12.0
 	github.com/getsentry/sentry-go v0.46.0
-	github.com/getsentry/sentry-go/otel v0.45.1
+	github.com/getsentry/sentry-go/otel v0.46.0
 	github.com/getsentry/sentry-go/otel/otlp v0.46.0
 	github.com/h2non/gock v1.2.0
-	github.com/mark3labs/mcp-go v0.48.0
+	github.com/mark3labs/mcp-go v0.49.0
 	github.com/sirupsen/logrus v1.9.4
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/viper v1.21.0
