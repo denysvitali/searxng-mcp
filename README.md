@@ -6,8 +6,8 @@ MCP (Model Context Protocol) server for Searxng - enables AI assistants to searc
 
 This MCP server provides two tools for AI assistants:
 
-- **web_search**: Search the web using Searxng and return structured results
-- **web_read**: Fetch and convert webpage content from URLs to Markdown
+- **searxng_search**: Search the web using Searxng and return structured results
+- **searxng_read**: Fetch and convert webpage content from URLs to Markdown
   - Reddit thread URLs are fetched through Reddit's JSON endpoint and rendered as readable Markdown
   - GitHub issue/PR URLs are fetched via GitHub API endpoints (issue/PR data + comments) and rendered as structured Markdown
 
@@ -50,7 +50,7 @@ claude mcp add searxng --scope user -- searxng-mcp serve --instance-url https://
 
 ## Tool Reference
 
-### web_search
+### searxng_search
 
 Search the web using Searxng and return limited results.
 
@@ -75,7 +75,7 @@ Search the web using Searxng and return limited results.
 }
 ```
 
-### web_read
+### searxng_read
 
 Fetch and read content from a URL, converting HTML to Markdown.
 

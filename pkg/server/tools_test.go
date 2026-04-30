@@ -51,7 +51,7 @@ func TestHandleWebSearch(t *testing.T) {
 				"query": "golang tutorial",
 				"limit": float64(5),
 			},
-			Name: "web_search",
+			Name: "searxng_search",
 		},
 	}
 
@@ -131,7 +131,7 @@ func TestHandleWebSearch_MissingQuery(t *testing.T) {
 			request := mcp.CallToolRequest{
 				Params: mcp.CallToolParams{
 					Arguments: tt.args,
-					Name:      "web_search",
+					Name:      "searxng_search",
 				},
 			}
 
@@ -191,7 +191,7 @@ func TestHandleWebSearch_WithFilters(t *testing.T) {
 				"category":   "news",
 				"page":       float64(2),
 			},
-			Name: "web_search",
+			Name: "searxng_search",
 		},
 	}
 
@@ -225,7 +225,7 @@ func TestHandleWebSearch_SearchError(t *testing.T) {
 			Arguments: map[string]interface{}{
 				"query": "test query",
 			},
-			Name: "web_search",
+			Name: "searxng_search",
 		},
 	}
 
@@ -265,7 +265,7 @@ func TestHandleWebRead(t *testing.T) {
 			Arguments: map[string]interface{}{
 				"url": ts.URL,
 			},
-			Name: "web_read",
+			Name: "searxng_read",
 		},
 	}
 
@@ -328,7 +328,7 @@ func TestHandleWebRead_MissingURL(t *testing.T) {
 			request := mcp.CallToolRequest{
 				Params: mcp.CallToolParams{
 					Arguments: tt.args,
-					Name:      "web_read",
+					Name:      "searxng_read",
 				},
 			}
 
@@ -379,7 +379,7 @@ func TestHandleWebRead_InvalidURL(t *testing.T) {
 					Arguments: map[string]interface{}{
 						"url": tt.url,
 					},
-					Name: "web_read",
+					Name: "searxng_read",
 				},
 			}
 

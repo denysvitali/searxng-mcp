@@ -47,9 +47,9 @@ func New(client *searxng.Client, extraOpts ...mcpserver.ServerOption) *Server {
 
 // registerTools registers all available tools
 func (s *Server) registerTools() {
-	// Register web_search tool
+	// Register searxng_search tool
 	webSearchTool := mcp.Tool{
-		Name:        "web_search",
+		Name:        "searxng_search",
 		Description: "Search the web and return limited results. Useful for finding current information, facts, and online resources.",
 		InputSchema: mcp.ToolInputSchema{
 			Type:     "object",
@@ -84,9 +84,9 @@ func (s *Server) registerTools() {
 	}
 	s.mcpServer.AddTool(webSearchTool, s.handleWebSearch)
 
-	// Register web_read tool
+	// Register searxng_read tool
 	webReadTool := mcp.Tool{
-		Name:        "web_read",
+		Name:        "searxng_read",
 		Description: "Fetch and read content from a URL, converting HTML to Markdown. Useful for extracting readable text from web pages.",
 		InputSchema: mcp.ToolInputSchema{
 			Type:     "object",
@@ -102,9 +102,9 @@ func (s *Server) registerTools() {
 	s.mcpServer.AddTool(webReadTool, s.handleWebRead)
 }
 
-// handleWebSearch handles the web_search tool call
+// handleWebSearch handles the searxng_search tool call
 func (s *Server) handleWebSearch(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	log.WithField("request", request).Debug("handling web_search")
+	log.WithField("request", request).Debug("handling searxng_search")
 
 	// Parse arguments
 	args, ok := request.Params.Arguments.(map[string]interface{})
@@ -155,9 +155,9 @@ func (s *Server) handleWebSearch(ctx context.Context, request mcp.CallToolReques
 	return mcp.NewToolResultText(string(resultJSON)), nil
 }
 
-// handleWebRead handles the web_read tool call
+// handleWebRead handles the searxng_read tool call
 func (s *Server) handleWebRead(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	log.WithField("request", request).Debug("handling web_read")
+	log.WithField("request", request).Debug("handling searxng_read")
 
 	// Parse arguments
 	args, ok := request.Params.Arguments.(map[string]interface{})

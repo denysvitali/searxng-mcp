@@ -29,8 +29,8 @@ var rootCmd = &cobra.Command{
 AI agents to search and navigate the web using Searxng instances.
 
 This server provides two main tools:
-  - web_search: Search the web and return limited results
-  - web_read: Fetch and read content from URLs, converting HTML to Markdown`,
+  - searxng_search: Search the web and return limited results
+  - searxng_read: Fetch and read content from URLs, converting HTML to Markdown`,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		// Initialize logger
 		log.Init(viper.GetString("log-level"))
